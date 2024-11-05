@@ -11,7 +11,8 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 #getting the data and setting up what is featuresr and targetrs
 FilePath = 'https://raw.githubusercontent.com/MrHexeberg/AI-medical-project/refs/heads/main/Tablet%20examination%20-%20Munka1.csv'
@@ -48,10 +49,74 @@ mae_target1 = mean_absolute_error(data_out_target_test.iloc[:, 0], test_pred[:, 
 mae_target2 = mean_absolute_error(data_out_target_test.iloc[:, 1], test_pred[:, 1])
 mae_target3 = mean_absolute_error(data_out_target_test.iloc[:, 2], test_pred[:, 2])
 
-print("MAE Tablet Hardness (N):", mae_target1)
-print("MAE Tablet Height (mm):", mae_target2)
-print("MAE Tablet Friability (%):", mae_target3)
+print("MAE Tablet Hardness (N):", mae_target1,"N")
+print("MAE Tablet Height (mm):", mae_target2,"mm")
+print("MAE Tablet Friability (%):", mae_target3*100 , " %")
 
 # pringing the data set out to a csv file for later user
 Output_Data = pd.concat([data_out_feature,data_out_target], axis = 1)
 Output_Data.to_csv("MinMaxScaler.csv", index=False)
+
+
+
+
+# Plotting Tablet Hardness (N)
+sample = 'Tablet Hardness (N)'
+test_sample = data_out_target_test[sample]
+plt.figure(figsize=(10,6))
+plt.scatter(test_sample,test_pred[:, 0])
+plt.plot([test_sample.min(), test_sample.max()],
+         [test_sample.min(), test_sample.max()], 'r--', lw=2)
+
+# Extension of the line ideal line
+plt.plot([test_sample.min()-2, test_sample.max()+2],
+         [test_sample.min()-2, test_sample.max()+2], 'r--', lw=2)
+
+plt.xlabel(f'Actual {sample}')
+plt.ylabel(f'Predicted {sample}')
+plt.title(f'Actual vs Predicted {sample}')
+
+
+# Making custom grid for the plot
+xy = np.arange(52, 102, 2)
+plt.xticks(xy)
+plt.yticks(xy)
+plt.grid()
+
+plt.show()
+
+# Tablet height
+sample = 'Tablet Height (mm)'
+test_sample =data_out_target_test[sample]
+plt.figure(figsize=(10,6))
+plt.scatter(test_sample, test_pred[:, 1])
+plt.plot([test_sample.min(), test_sample.max()],
+         [test_sample.min(), test_sample.max()], 'r--', lw=2, label='y_test minmax')
+plt.xlabel(f'Actual {sample}')
+plt.ylabel(f'Predicted {sample}')
+plt.title(f'Actual vs Predicted {sample}')
+plt.legend()
+
+# Making custom grid for the plot
+xy = np.arange(4.4, 6.2, 0.1)
+plt.xticks(xy)
+plt.yticks(xy)
+plt.grid()
+plt.show()
+
+# Plotting Tablet Friability (%)
+sample = 'Tablet Friability (%)'
+test_sample = data_out_target_test[sample]
+plt.scatter(test_sample, test_pred[:, 2])
+plt.plot([test_sample.min(), test_sample.max()],
+         [test_sample.min(), test_sample.max()], 'r--', lw=2)
+plt.xlabel(f'Actual {sample}')
+plt.ylabel(f'Predicted {sample}')
+plt.title(f'Actual vs Predicted {sample}')
+
+# Making custom grid for the plot
+xy = np.arange(0.1, 0.5, 0.05)
+plt.xticks(xy)
+plt.yticks(xy)
+plt.grid()
+plt.show()
