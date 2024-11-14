@@ -16,8 +16,8 @@ from sklearn import tree
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-
-
+from sklearn.metrics import root_mean_squared_error, r2_score
+from win32con import NULLREGION
 
 #getting the data and setting up what is feature and target
 FilePath = 'https://raw.githubusercontent.com/MrHexeberg/AI-medical-project/refs/heads/main/Tablet%20examination%20-%20Munka1.csv'
@@ -26,25 +26,32 @@ TargetColumns = ['Tablet Hardness (N)','Tablet Height (mm)','Tablet Friability (
 
 Input_data = pd.read_csv(FilePath, header=1, skiprows=0)
 Input_data = Input_data.drop(columns="Measurement")
-t0 = time.time()
+
 print(Input_data)
 
+
+
 print("We are doing stuff with the data...")
-#spliting the data in to target and feature
+
+t0 = time.time()
+
+#splitting the data in to target and feature
 data_out_feature = Input_data.drop(columns= TargetColumns )
 data_out_target = Input_data.drop(columns = FeatureColumns)
 #minmax scaling the feature data
 scaler = preprocessing.MinMaxScaler()
 data_out_feature = scaler.fit_transform(data_out_feature)
 data_out_feature = pd.DataFrame(data_out_feature, columns = FeatureColumns)
-#bit of printing to see if anyting is wronge
-print(data_out_feature)
-print(data_out_target)
+
+
+
 print("We are noe fitting the model\nThis may take a moment...\n")
 #testing out a model on the data and the scaling. fist spliting it up
-data_out_feature_train, data_out_feature_test, data_out_target_train, data_out_target_test = train_test_split(data_out_feature, data_out_target, test_size=0.2, random_state=42)
+data_out_feature_train, data_out_feature_test, data_out_target_train, data_out_target_test = train_test_split(data_out_feature, data_out_target, test_size=0.2, random_state=None)
+
+
 #valling the model and puting in the data
-model = RandomForestRegressor(n_estimators=10, random_state=42)
+model = RandomForestRegressor(n_estimators=10, random_state=None)
 model.fit(data_out_feature_train, data_out_target_train)
 
 test_pred = model.predict(data_out_feature_test)
@@ -53,6 +60,13 @@ t1 = time.time()
 
 total = t1-t0
 
+test = ""
+
+
+y_pred = model.predict(data_out_feature_test)
+
+rmse = root_mean_squared_error(data_out_target_test, y_pred)
+r2 = r2_score(data_out_target_test, y_pred)
 
 
 
@@ -61,10 +75,12 @@ total = t1-t0
 mae_target1 = mean_absolute_error(data_out_target_test.iloc[:, 0], test_pred[:, 0])
 mae_target2 = mean_absolute_error(data_out_target_test.iloc[:, 1], test_pred[:, 1])
 mae_target3 = mean_absolute_error(data_out_target_test.iloc[:, 2], test_pred[:, 2])
-print("time to compleat", total)
-print("MAE Tablet Hardness (N):", mae_target1,"N")
-print("MAE Tablet Height (mm):", mae_target2,"mm")
-print("MAE Tablet Friability (%):", mae_target3*100 , " %")
+print("time to compleat", total, ".s")
+print("MAE Tablet Hardness:", mae_target1,".N")
+print("MAE Tablet Height:", mae_target2,".mm")
+print("MAE Tablet Friability:", mae_target3*100 , " %")
+print('RMSE:', rmse)
+print('R2:', r2)
 
 
 print("tree depth = ", model.estimators_[0].tree_.max_depth)
