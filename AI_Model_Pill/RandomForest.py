@@ -1,14 +1,8 @@
-#what do we need to do to the data
-#what can be smart to do
-# 1 . normalice tablet hardness and hight
-# 2 clean up the pressforce
-# 3 do tomting about the partical size data
-
-
 
 #imports
 import pandas as pd
 from sklearn import preprocessing
+from sklearn.cluster import mean_shift
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
@@ -17,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 from sklearn.metrics import root_mean_squared_error, r2_score
-from win32con import NULLREGION
+
 
 #getting the data and setting up what is feature and target
 FilePath = 'https://raw.githubusercontent.com/MrHexeberg/AI-medical-project/refs/heads/main/Tablet%20examination%20-%20Munka1.csv'
@@ -29,7 +23,7 @@ Input_data = Input_data.drop(columns="Measurement")
 
 print(Input_data)
 
-
+print(Input_data.mean())
 
 print("We are doing stuff with the data...")
 
@@ -47,11 +41,11 @@ data_out_feature = pd.DataFrame(data_out_feature, columns = FeatureColumns)
 
 print("We are noe fitting the model\nThis may take a moment...\n")
 #testing out a model on the data and the scaling. fist spliting it up
-data_out_feature_train, data_out_feature_test, data_out_target_train, data_out_target_test = train_test_split(data_out_feature, data_out_target, test_size=0.2, random_state=None)
+data_out_feature_train, data_out_feature_test, data_out_target_train, data_out_target_test = train_test_split(data_out_feature, data_out_target, test_size=0.2, random_state=42)
 
 
 #valling the model and puting in the data
-model = RandomForestRegressor(n_estimators=10, random_state=None)
+model = RandomForestRegressor(n_estimators=10, random_state=42)
 model.fit(data_out_feature_train, data_out_target_train)
 
 test_pred = model.predict(data_out_feature_test)
@@ -79,13 +73,13 @@ print("time to compleat", total, ".s")
 print("MAE Tablet Hardness:", mae_target1,".N")
 print("MAE Tablet Height:", mae_target2,".mm")
 print("MAE Tablet Friability:", mae_target3*100 , " %")
-print('RMSE:', rmse)
-print('R2:', r2)
+#print('RMSE:', rmse)
+#print('R2:', r2)
 
 
 print("tree depth = ", model.estimators_[0].tree_.max_depth)
 print("Number of trees" , len(model.estimators_))
-print("We are now making the visual'\n")
+print("\n\n\nWe are now making the visual'\n")
 # pringing the data set out to a csv file for later user
 Output_Data = pd.concat([data_out_feature,data_out_target], axis = 1)
 Output_Data.to_csv("MinMaxScaler.csv", index=False)
